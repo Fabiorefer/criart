@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Produtos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #f8f8f8;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .logo {
+            height: 50px;
+        }
+        nav {
+            margin: 10px 0;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+            position: relative;
+        }
+        nav a .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3rem;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            width: calc(33.333% - 2rem); /* Ajusta a largura para 3 cards por linha */
+            text-align: center;
+            box-sizing: border-box; /* Para incluir padding e border no cálculo da largura */
+        }
+        .card img {
+            max-width: 100%;
+            height: auto;
+        }
+        .finalizar-compra, .zerar-carrinho {
+            display: inline-block;
+            margin: 20px 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .zerar-carrinho {
+            background-color: #6f42c1;
+        }
+        .custom-order-button {
+            background-color: orange;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .floating-box {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: white;
+            border: 2px solid orange;
+            padding: 10px;
+            font-size: 16px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .modal {
+            display: none; /* Oculto por padrão */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .card {
+                width: calc(50% - 2rem); /* Ajusta a largura para 2 cards por linha */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                width: 100%; /* Ajusta a largura para 1 card por linha */
+            }
+            nav a {
+                display: block; /* Alinha os links do nav verticalmente em telas pequenas */
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="/img/logo.png" alt="Logo" class="logo">
+        <nav>
+            <a href="pedido.html">
+                Seu Carrinho
+                <span class="cart-count" id="cart-count">0</span>
+            </a>
+        </nav>
+    </header>
+
+    <h1>Produtos</h1>
+    <div class="container">
+        <div class="card">
+            <img src="/img/produto1.jpg" alt="Produto 1">
+            <h2>Copo Termico Gravado a Laser</h2>
+            <p>R$ 49,90</p>
+            <button onclick="adicionarAoCarrinho('Copo Termico Gravado a Laser', 49.90)">Comprar</button>
+        </div>
+        <div class="card">
+            <img src="/img/produto.jpg" alt="Produto 2">
+            <h2>Squeeze de Alumínio</h2>
+            <p>R$ 69,90</p>
+            <button onclick="adicionarAoCarrinho('Squeeze de Alumínio', 69.90)">Comprar</button>
+        </div>
+        <div class="card">
+            <img src="/img/produto5.jpg" alt="Produto 3">
+            <h2>Camiseta 100% Algodão/Atacado Preço Especial</h2>
+            <p>R$ 79,90 unid.</p>
+            <button onclick="adicionarAoCarrinho('Camiseta 100% Algodão/Atacado Preço Especial', 79.90)">Comprar</button>
+        </div>
+        <div class="card">
+            <img src="/img/produto6.jpg" alt="Produto 4">
+            <h2>Copo descartavel Personalizado pedido minimo 50 unidades</h2>
+            <p>R$ A Combinar</p>
+            <button onclick="adicionarAoCarrinho('Copo descartavel Personalizado pedido minimo 50 unidades', 0)">Comprar</button>
+        </div>
+        <div class="card">
+            <img src="/img/produto20.jpg" alt="Produto 5">
+            <h2>Caneca de Ceramica</h2>
+            <p>R$ 39,90</p>
+            <button onclick="adicionarAoCarrinho('Caneca de Ceramica', 39.90)">Comprar</button>
+        </div>
+        <div class="card">
+            <img src="/img/produto11.jpg" alt="Produto 6">
+            <h2>Caneleira de Futebol</h2>
+            <p>R$ 59,90</p>
+            <button onclick="adicionarAoCarrinho('Caneleira de Futebol', 59.90)">Comprar</button>
+        </div>
+        <div class="card">
+            <img src="/img/produto19.jpg" alt="Produto 7">
+            <h2>Caneca Chop de Vidro Jateada</h2>
+            <p>R$ 69,90</p>
+            <button onclick="adicionarAoCarrinho('Caneca Chop de Vidro Jateada', 69.90)">Comprar</button>
+        </div>
+    </div>
+    
+    <div style="text-align: center;">
+        <button class="finalizar-compra" onclick="finalizarCompra()">Finalizar Compra</button>
+        <button class="zerar-carrinho" onclick="zerarCarrinho()">Zerar Carrinho</button>
+        <!-- Botão Adicional -->
+        <button class="custom-order-button" onclick="openModal()">Clique aqui e faça seu pedido personalizado</button>
+        <!-- Modal -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <p>Nosso contato WhatsApp: +55 (17) 98101-1401</p>
+                <p style="font-size: smaller;">Obs: Somente Mensagem.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function atualizarCarrinho() {
+            let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            document.getElementById('cart-count').textContent = carrinho.length;
+        }
+
+        function adicionarAoCarrinho(produto, preco) {
+            let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            carrinho.push({ produto, preco });
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            alert(produto + ' foi adicionado ao carrinho!');
+            atualizarCarrinho();
+        }
+
+        function zerarCarrinho() {
+            localStorage.setItem('carrinho', JSON.stringify([]));
+            alert('O carrinho foi zerado!');
+            atualizarCarrinho();
+        }
+
+        function finalizarCompra() {
+            window.location.href = "pedido.html";
+        }
+
+        document.addEventListener('DOMContentLoaded', atualizarCarrinho);
+
+        // Função para abrir a modal
+        function openModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        // Função para fechar a modal
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        // Fechar a modal quando o usuário clicar fora dela
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("myModal")) {
+                document.getElementById("myModal").style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Meta tag para responsividade -->
+    <title>Fazer Pedido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; /* Adicionado para melhor controle de box model */
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px; /* Adicionado padding */
+            width: 100%; /* Para que a largura ocupe 100% em telas menores */
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 10px; /* Aumentado para melhor usabilidade */
+            margin-top: 5px;
+            border: 1px solid #ccc; /* Adicionado borda */
+            border-radius: 4px; /* Adicionado arredondamento */
+        }
+        .total {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* Botão ocupa toda a largura */
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; /* Para ser mais responsivo */
+            max-width: 500px; /* Máximo de largura */
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .obs {
+            margin-top: 10px;
+            font-size: 14px;
+            color: red;
+        }
+
+        /* Media Queries para responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px; /* Menos padding em telas menores */
+            }
+            .total, .obs {
+                font-size: 16px; /* Fonte menor em telas pequenas */
+            }
+            button {
+                padding: 15px; /* Aumentar padding do botão para melhor usabilidade */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 24px; /* Diminuir tamanho da fonte do título */
+            }
+            input {
+                padding: 8px; /* Menos padding em telas muito pequenas */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Seu Carrinho</h1>
+        <ul id="carrinho">
+            <!-- Produtos serão adicionados aqui -->
+        </ul>
+        <form id="form-pedido" action="confirma_pedido.html">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" name="endereco" required>
+
+            <label for="cep">CEP:</label>
+            <input type="text" id="cep" name="cep" required onblur="calcularFrete()">
+
+            <label for="telefone">Telefone:</label>
+            <input type="text" id="telefone" name="telefone" required>
+
+            <label for="estado">Estado:</label>
+            <input type="text" id="estado" name="estado" required>
+
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" name="cidade" required>
+
+            <div class="total" id="total-frete">Frete: R$0,00</div>
+            <input type="submit" value="Confirme seu pedido que entraremos em contato para Personalizar seu Presente" onclick="confirmarPedido(event)">
+            <div class="obs">Obs: No limite de 2 Dias úteis.</div>
+        </form>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <p>Seu pedido foi confirmado com sucesso!</p>
+            <button onclick="irParaIndex()">OK</button>
+        </div>
+    </div>
+    <div>
+        <img src="/img/qrcod.jpg" style="max-width: 100%; height: auto;"> <!-- Imagem responsiva -->
+        <h4>Pague no Pix e mande o Comprovate Whassp 17 981011401</h4> 
+    </div>
+
+    <script>
+        let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        const ul = document.getElementById('carrinho');
+        let total = 0;
+
+        carrinho.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.produto}:- R$${item.preco.toFixed(2)}`;
+            ul.appendChild(li);
+            total += item.preco;
+        });
+
+        const totalElement = document.createElement('div');
+        totalElement.classList.add('total');
+        totalElement.textContent = `Total: R$${total.toFixed(2)}`;
+        ul.appendChild(totalElement);
+
+        document.getElementById('form-pedido').onsubmit = function(event) {
+            event.preventDefault();
+            let pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            let pedido = {
+                nome: document.getElementById('nome').value,
+                endereco: document.getElementById('endereco').value,
+                cep: document.getElementById('cep').value,
+                telefone: document.getElementById('telefone').value,
+                estado: document.getElementById('estado').value,
+                cidade: document.getElementById('cidade').value,
+                produtos: carrinho,
+                total: total
+            };
+            pedidos.push(pedido);
+            localStorage.setItem('pedidos', JSON.stringify(pedidos));
+            localStorage.setItem('carrinho', JSON.stringify([])); // Zera o carrinho
+            mostrarModal();
+        };
+
+        function calcularFrete() {
+            const cep = document.getElementById('cep').value;
+            let frete = 0;
+            // Simulação de cálculo de frete
+            if (cep.startsWith('01')) {
+                frete = 10.00;
+            } else if (cep.startsWith('02')) {
+                frete = 15.00;
+            } else {
+                frete = 20.00;
+            }
+            document.getElementById('total-frete').textContent = `Frete: R$${frete.toFixed(2)}`;
+        }
+
+        function mostrarModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        function fecharModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        function irParaIndex() {
+            fecharModal();
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

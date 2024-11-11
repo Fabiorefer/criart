@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Meta tag para responsividade -->
+    <title>Pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px; /* Adicionado padding ao body */
+        }
+        h1 {
+            text-align: center; /* Centraliza o título */
+        }
+        .pedido {
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            margin-bottom: 15px; /* Espaçamento entre os pedidos */
+        }
+        .pedido label {
+            display: block;
+            font-weight: bold;
+        }
+        .pedido div {
+            margin-bottom: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* Botão ocupa toda a largura */
+        }
+
+        /* Media Queries para responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px; /* Menos padding em telas menores */
+            }
+            button {
+                padding: 12px; /* Aumentar o padding do botão para melhor usabilidade */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 24px; /* Diminuir tamanho da fonte do título */
+            }
+            .pedido {
+                padding: 5px 0; /* Menos padding nos pedidos */
+            }
+            button {
+                padding: 10px; /* Menos padding no botão */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Pedidos</h1>
+    <ul id="lista-pedidos">
+        <!-- Pedidos serão adicionados aqui -->
+    </ul>
+
+    <script>
+        let pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+        const ul = document.getElementById('lista-pedidos');
+    
+        pedidos.forEach((pedido, index) => {
+            const li = document.createElement('li');
+            li.className = 'pedido';
+            let produtosHtml = '';
+    
+            pedido.produtos.forEach(prod => {
+                produtosHtml += `<div>${prod.produto}: ${prod.descricao} - R$${prod.preco.toFixed(2)}</div>`;
+            });
+    
+            li.innerHTML = `
+                <div><label>Nome:</label> ${pedido.nome}</div>
+                <div><label>Endereço:</label> ${pedido.endereco}</div>
+                <div><label>CEP:</label> ${pedido.cep}</div>
+                <div><label>Telefone:</label> ${pedido.telefone}</div>
+                <div><label>Estado:</label> ${pedido.estado}</div>
+                <div><label>Cidade:</label> ${pedido.cidade}</div>
+                <div><label>Produtos:</label>${produtosHtml}
+                <div><label>Total:</label> R$${pedido.total.toFixed(2)}</div>
+            `;
+            const button = document.createElement('button');
+            button.textContent = 'Salvar Pedido';
+            button.onclick = () => salvarPedido(pedido, index);
+            li.appendChild(button);
+            ul.appendChild(li);
+        });
+    
+        function salvarPedido(pedido, index) {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pedido));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `pedido_${index + 1}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            // Remove pedido da lista
+            pedidos.splice(index, 1);
+            localStorage.setItem('pedidos', JSON.stringify(pedidos));
+            location.reload(); // Recarrega a página para atualizar a lista de pedidos
+        }
+    </script>
+    
+</body>
+</html>
